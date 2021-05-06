@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a99c9ba7f3d744034ac1e63e960691f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  digClip: {fileID: 7400000, guid: d52b22eda272946ee84e3b6323294972, type: 2}
 --- !u!114 &2984346218538807359
 MonoBehaviour:
   m_ObjectHideFlags: 0
