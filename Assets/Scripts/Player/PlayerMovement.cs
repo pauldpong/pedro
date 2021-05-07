@@ -6,7 +6,6 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private bool m_attemptingMove = false;
-    private Vector2 m_originalPosition, m_targetPosition;
     private bool m_isFacingRight = true;
 
     [SerializeField]
@@ -43,46 +42,12 @@ public class PlayerMovement : MonoBehaviour
 
         m_attemptingMove = true;
 
-        //TODO yield break when cant move need to reset attempingMove bool
-        CheckAndSendOrientation(direction);
-        if (!CanMove(direction)) yield break;
+        CheckAndSendOrientationEvent(direction);
 
-        startedMovingEvent.Invoke();
+        Vector2 originalPosition = transform.position;
+        Vector2 targetPosition = originalPosition + direction;
 
-        float elapsedTime = 0.0f;
-        m_originalPosition = transform.position;
-        m_targetPosition = m_originalPosition + direction;
-
-        while (elapsedTime < m_timeToMove)
-        {
-            transform.position = Vector3.Lerp(m_originalPosition, m_targetPosition, (elapsedTime / m_timeToMove));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.position = m_targetPosition;
-
-        stoppedMovingEvent.Invoke();
-        m_attemptingMove = false;
-    }
-
-    private void CheckAndSendOrientation(Vector2 direction)
-    {
-        if (direction == Vector2.left && m_isFacingRight)
-        {
-            m_isFacingRight = false;
-            orientationFlippedEvent.Invoke();
-        }
-        if (direction == Vector2.right && !m_isFacingRight)
-        {
-            m_isFacingRight = true;
-            orientationFlippedEvent.Invoke();
-        }
-    }
-
-    private bool CanMove(Vector3 direction)
-    {
-        Vector3 targetPosition = transform.position + direction;
+        // Check if anything blocking player
         Collider2D collider = Physics2D.OverlapCircle(targetPosition, 0.25f, m_collisionLayer);
         if (collider != null)
         {
@@ -93,17 +58,50 @@ public class PlayerMovement : MonoBehaviour
                 playerAnimation.Dig();
             }
 
+            // Let dig animation play until pick hits the block
+            yield return new WaitForSeconds(playerAnimation.GetDigAnimationLength() / 2);
+
             IBreakable breakable = collider.gameObject.GetComponent<IBreakable>();
             if (breakable != null)
             {
                 breakable.OnHit();
             }
-
-            return false;
+            else
+            {
+                // Unbreakable gameObject, break out of coroutine
+                m_attemptingMove = false;
+                yield break;
+            }
         }
-        else
+
+        startedMovingEvent.Invoke();
+
+        float elapsedTime = 0.0f;
+        while (elapsedTime < m_timeToMove)
         {
-            return true;
+            transform.position = Vector3.Lerp(originalPosition, targetPosition, (elapsedTime / m_timeToMove));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure player is at the target position (while loop can terminate just before we reach exact location)
+        transform.position = targetPosition;
+
+        stoppedMovingEvent.Invoke();
+        m_attemptingMove = false;
+    }
+
+    private void CheckAndSendOrientationEvent(Vector2 direction)
+    {
+        if (direction == Vector2.left && m_isFacingRight)
+        {
+            m_isFacingRight = false;
+            orientationFlippedEvent.Invoke();
+        }
+        if (direction == Vector2.right && !m_isFacingRight)
+        {
+            m_isFacingRight = true;
+            orientationFlippedEvent.Invoke();
         }
     }
 }
