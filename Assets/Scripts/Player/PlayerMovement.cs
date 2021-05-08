@@ -7,18 +7,28 @@ public class PlayerMovement : MonoBehaviour
 {
     private bool m_attemptingMove = false;
     private bool m_isFacingRight = true;
+    private bool m_grounded = true;
 
     [SerializeField]
     private UnityEvent startedMovingEvent;
     [SerializeField]
     private UnityEvent stoppedMovingEvent;
     [SerializeField]
+    private UnityEvent fallEvent;
+    [SerializeField]
+    private UnityEvent landEvent;
+    [SerializeField]
     private UnityEvent orientationFlippedEvent;
+    [SerializeField]
+    private Transform m_groundCheck;
 
     [SerializeField]
     private float m_timeToMove = 0.2f;
     [SerializeField]
     private LayerMask m_collisionLayer;
+
+    const float k_GroundedRadius = 0.25f;
+    const float k_CollisionRadius = 0.25f;
 
     private void Update()
     {
@@ -48,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 targetPosition = originalPosition + direction;
 
         // Check if anything blocking player
-        Collider2D collider = Physics2D.OverlapCircle(targetPosition, 0.25f, m_collisionLayer);
+        Collider2D collider = Physics2D.OverlapCircle(targetPosition, k_CollisionRadius, m_collisionLayer);
         if (collider != null)
         {
             // Play dig animation
@@ -87,6 +97,23 @@ public class PlayerMovement : MonoBehaviour
         // Ensure player is at the target position (while loop can terminate just before we reach exact location)
         transform.position = targetPosition;
 
+        bool wasAirborne = !m_grounded;
+        m_grounded = false;
+        Collider2D groundCollider = Physics2D.OverlapCircle(m_groundCheck.position, k_GroundedRadius, m_collisionLayer);
+        if (groundCollider != null)
+        {
+            m_grounded = true;
+        }
+
+        if (!wasAirborne && !m_grounded)
+        {
+            fallEvent.Invoke();
+        }
+        else if (wasAirborne && m_grounded)
+        {
+            landEvent.Invoke();
+        }
+
         stoppedMovingEvent.Invoke();
         m_attemptingMove = false;
     }
@@ -102,6 +129,14 @@ public class PlayerMovement : MonoBehaviour
         {
             m_isFacingRight = true;
             orientationFlippedEvent.Invoke();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!m_grounded)
+        {
+            StartCoroutine(MovePlayer(Vector2.down));
         }
     }
 }

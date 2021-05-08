@@ -31,4 +31,14 @@ public class PlayerAnimation : MonoBehaviour
     {
         return digClip.length;
     }
+
+    public void OnFall()
+    {
+        m_animator.SetTrigger("Fall");
+    }
+
+    public void OnLand()
+    {
+        m_animator.SetTrigger("Land");
+    }
 }
