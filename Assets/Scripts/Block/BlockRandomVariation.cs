@@ -3,18 +3,17 @@ using UnityEngine;
 public class BlockRandomVariation : MonoBehaviour
 {
     [SerializeField]
-    private Sprite[] m_spriteList;
-    [SerializeField]
-    private SpriteRenderer m_spriteRenderer;
+    private Sprite[] m_SpriteList;
+    private SpriteRenderer m_SpriteRenderer;
 
     private void Awake()
     {
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_SpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
     {
-        int randomIndex = Random.Range(0, m_spriteList.Length);
-        m_spriteRenderer.sprite = m_spriteList[randomIndex];
+        int randomIndex = Random.Range(0, m_SpriteList.Length);
+        m_SpriteRenderer.sprite = m_SpriteList[randomIndex];
     }
 }

@@ -132,7 +132,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 657684807
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 8336989541107805487, guid: a9aa0269bce9971419f5d58a83468665, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ddacadd38d5d4ebebf165c53fd7eb17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startedMovingEvent:
+  StartedMovingEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6692418686632222894}
@@ -191,7 +191,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  stoppedMovingEvent:
+  StoppedMovingEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6692418686632222894}
@@ -206,7 +206,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  fallEvent:
+  FallEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6692418686632222894}
@@ -221,7 +221,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  landEvent:
+  LandEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6692418686632222894}
@@ -236,7 +236,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  orientationFlippedEvent:
+  OrientationFlippedEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2984346218538807359}
@@ -251,9 +251,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  m_groundCheck: {fileID: 1807117927598136906}
-  m_timeToMove: 0.2
-  m_collisionLayer:
+  m_GroundCheck: {fileID: 1807117927598136906}
+  m_ToToMove: 0.2
+  m_CollisionLayer:
     serializedVersion: 2
     m_Bits: 64
 --- !u!114 &6692418686632222894

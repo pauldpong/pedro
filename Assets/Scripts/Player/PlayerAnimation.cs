@@ -2,43 +2,43 @@ using UnityEngine;
 
 public class PlayerAnimation : MonoBehaviour
 {
-    private Animator m_animator;
+    private Animator m_Animator;
 
     [SerializeField]
-    private AnimationClip digClip;
+    private AnimationClip m_DigClip;
 
     private void Start()
     {
-        m_animator = GetComponent<Animator>();
+        m_Animator = GetComponent<Animator>();
     }
 
     public void OnStartedMoving()
     {
-        m_animator.SetBool("IsMoving", true);
+        m_Animator.SetBool("IsMoving", true);
     }
 
     public void OnStoppedMoving()
     {
-        m_animator.SetBool("IsMoving", false);
+        m_Animator.SetBool("IsMoving", false);
     }
 
     public void Dig()
     {
-        m_animator.SetTrigger("Dig");
+        m_Animator.SetTrigger("Dig");
     }
 
     public float GetDigAnimationLength()
     {
-        return digClip.length;
+        return m_DigClip.length;
     }
 
     public void OnFall()
     {
-        m_animator.SetTrigger("Fall");
+        m_Animator.SetTrigger("Fall");
     }
 
     public void OnLand()
     {
-        m_animator.SetTrigger("Land");
+        m_Animator.SetTrigger("Land");
     }
 }

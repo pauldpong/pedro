@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class PlayerFlip : MonoBehaviour
 {
-    private SpriteRenderer m_spriteRenderer;
+    private SpriteRenderer m_SpriteRenderer;
 
     void Start()
     {
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_SpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     public void OnOrientationFlipped()
     {
-        m_spriteRenderer.flipX = !m_spriteRenderer.flipX;
+        m_SpriteRenderer.flipX = !m_SpriteRenderer.flipX;
     }
 }

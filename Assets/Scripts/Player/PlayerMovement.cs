@@ -5,28 +5,31 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerAnimation))]
 public class PlayerMovement : MonoBehaviour
 {
-    private bool m_attemptingMove = false;
-    private bool m_isFacingRight = true;
-    private bool m_grounded = true;
+    private bool m_AttemptingMove = false;
+    private bool m_IsFacingRight = true;
+    private bool m_Grounded = true;
 
+    /* Events */
     [SerializeField]
-    private UnityEvent startedMovingEvent;
+    private UnityEvent StartedMovingEvent;
     [SerializeField]
-    private UnityEvent stoppedMovingEvent;
+    private UnityEvent StoppedMovingEvent;
     [SerializeField]
-    private UnityEvent fallEvent;
+    private UnityEvent FallEvent;
     [SerializeField]
-    private UnityEvent landEvent;
+    private UnityEvent LandEvent;
     [SerializeField]
-    private UnityEvent orientationFlippedEvent;
-    [SerializeField]
-    private Transform m_groundCheck;
+    private UnityEvent OrientationFlippedEvent;
 
+    /* Parameters */
     [SerializeField]
-    private float m_timeToMove = 0.2f;
+    private Transform m_GroundCheck;
     [SerializeField]
-    private LayerMask m_collisionLayer;
+    private float m_TimeToMove = 0.2f;
+    [SerializeField]
+    private LayerMask m_CollisionLayer;
 
+    /* Constants */
     const float k_GroundedRadius = 0.25f;
     const float k_CollisionRadius = 0.25f;
 
@@ -48,9 +51,12 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator MovePlayer(Vector2 direction)
     {
-        if (m_attemptingMove) yield break;
+        if (m_AttemptingMove) yield break;
 
-        m_attemptingMove = true;
+        // No air movement
+        if (!m_Grounded && direction != Vector2.down) yield break;
+
+        m_AttemptingMove = true;
 
         CheckAndSendOrientationEvent(direction);
 
@@ -58,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 targetPosition = originalPosition + direction;
 
         // Check if anything blocking player
-        Collider2D collider = Physics2D.OverlapCircle(targetPosition, k_CollisionRadius, m_collisionLayer);
+        Collider2D collider = Physics2D.OverlapCircle(targetPosition, k_CollisionRadius, m_CollisionLayer);
         if (collider != null)
         {
             // Play dig animation
@@ -79,17 +85,17 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 // Unbreakable gameObject, break out of coroutine
-                m_attemptingMove = false;
+                m_AttemptingMove = false;
                 yield break;
             }
         }
 
-        startedMovingEvent.Invoke();
+        StartedMovingEvent.Invoke();
 
         float elapsedTime = 0.0f;
-        while (elapsedTime < m_timeToMove)
+        while (elapsedTime < m_TimeToMove)
         {
-            transform.position = Vector3.Lerp(originalPosition, targetPosition, (elapsedTime / m_timeToMove));
+            transform.position = Vector3.Lerp(originalPosition, targetPosition, (elapsedTime / m_TimeToMove));
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -97,44 +103,45 @@ public class PlayerMovement : MonoBehaviour
         // Ensure player is at the target position (while loop can terminate just before we reach exact location)
         transform.position = targetPosition;
 
-        bool wasAirborne = !m_grounded;
-        m_grounded = false;
-        Collider2D groundCollider = Physics2D.OverlapCircle(m_groundCheck.position, k_GroundedRadius, m_collisionLayer);
+        // Ground detection
+        bool wasAirborne = !m_Grounded;
+        m_Grounded = false;
+        Collider2D groundCollider = Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_CollisionLayer);
         if (groundCollider != null)
         {
-            m_grounded = true;
+            m_Grounded = true;
         }
 
-        if (!wasAirborne && !m_grounded)
+        if (!wasAirborne && !m_Grounded)
         {
-            fallEvent.Invoke();
+            FallEvent.Invoke();
         }
-        else if (wasAirborne && m_grounded)
+        else if (wasAirborne && m_Grounded)
         {
-            landEvent.Invoke();
+            LandEvent.Invoke();
         }
 
-        stoppedMovingEvent.Invoke();
-        m_attemptingMove = false;
+        StoppedMovingEvent.Invoke();
+        m_AttemptingMove = false;
     }
 
     private void CheckAndSendOrientationEvent(Vector2 direction)
     {
-        if (direction == Vector2.left && m_isFacingRight)
+        if (direction == Vector2.left && m_IsFacingRight)
         {
-            m_isFacingRight = false;
-            orientationFlippedEvent.Invoke();
+            m_IsFacingRight = false;
+            OrientationFlippedEvent.Invoke();
         }
-        if (direction == Vector2.right && !m_isFacingRight)
+        if (direction == Vector2.right && !m_IsFacingRight)
         {
-            m_isFacingRight = true;
-            orientationFlippedEvent.Invoke();
+            m_IsFacingRight = true;
+            OrientationFlippedEvent.Invoke();
         }
     }
 
     private void FixedUpdate()
     {
-        if (!m_grounded)
+        if (!m_Grounded)
         {
             StartCoroutine(MovePlayer(Vector2.down));
         }
